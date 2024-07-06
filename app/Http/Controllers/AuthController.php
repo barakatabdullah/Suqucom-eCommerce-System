@@ -11,12 +11,12 @@ class AuthController extends Controller
     public function create(Request $request)
     {
         // Get a validator for an incoming registration request.
-        $validator = validator($request->only('email', 'username', 'password','avatar','user_type', "password_confirmation"), [
+        $validator = validator($request->only('email', 'username', 'password','avatar','user_type','user_type', "password_confirmation"), [
             'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'avatar' => 'string|max:255',
-            'user_type' => 'string|max:255',
+            'user_type' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -24,15 +24,14 @@ class AuthController extends Controller
         }
 
         try {
-            $data = $request->only('email', 'username', 'password', 'avatar');
-            $data['user_type'] = $request->input('user_type', 'customer');
+            $data = $request->only('email', 'username', 'password', 'avatar', 'user_type');
 
             $user = User::create([
                 'name' => $data['username'],
                 'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'avatar' => $data['avatar'],
                 'user_type' => $data['user_type'],
+                'password' => Hash::make($data['password']),
+                'avatar' => $data['avatar'] ?? null,
             ]);
 
             $token = $user->createToken('access')->accessToken;
