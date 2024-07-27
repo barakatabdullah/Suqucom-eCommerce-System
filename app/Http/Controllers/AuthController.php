@@ -11,12 +11,15 @@ class AuthController extends Controller
     public function create(Request $request)
     {
         // Get a validator for an incoming registration request.
-        $validator = validator($request->only('email', 'username', 'password','avatar','user_type','user_type', "password_confirmation"), [
-            'username' => 'required|string|max:255',
+        $validator = validator($request->only('email', 'fname','lname','phone','city', 'password','user_type', "password_confirmation",'avatar',), [
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'phone' => 'required|numeric|max:999999999',
+            'city' => 'required|string|max:255',
             'avatar' => 'string|max:255',
-            'user_type' => 'required|string|max:255',
+            'user_type' => 'string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -24,14 +27,20 @@ class AuthController extends Controller
         }
 
         try {
-            $data = $request->only('email', 'username', 'password', 'avatar', 'user_type');
+            $data = $request->only('email', 'fname','lname', 'password', 'avatar', 'user_type');
 
             $user = User::create([
-                'name' => $data['username'],
+                'fname' => $data['fname'],
+                'lname' => $data['lname'],
                 'email' => $data['email'],
-                'user_type' => $data['user_type'],
+                'user_type' => $data['user_type']?? 'customer',
                 'password' => Hash::make($data['password']),
                 'avatar' => $data['avatar'] ?? null,
+            ]);
+
+            $user->contactDetails()->create([
+                'phone' => $request->phone,
+                'city' => $request->city,
             ]);
 
             $token = $user->createToken('access')->accessToken;
