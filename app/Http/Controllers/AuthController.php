@@ -15,7 +15,7 @@ class AuthController extends Controller
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|numeric|max:999999999',
             'city' => 'required|string|max:255',
             'avatar' => 'string|max:255',
@@ -55,7 +55,7 @@ class AuthController extends Controller
     {
         $valid = validator($request->only('email', 'password'), [
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
         ]);
 
         if ($valid->fails()) {
