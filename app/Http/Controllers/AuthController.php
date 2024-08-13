@@ -11,7 +11,7 @@ class AuthController extends Controller
     public function create(Request $request)
     {
         // Get a validator for an incoming registration request.
-        $validator = validator($request->only('email', 'fname','lname','phone','city', 'password','user_type', "password_confirmation",'avatar',), [
+        $validator = validator($request->only('email', 'fname','lname','phone','city', 'password','role', "password_confirmation",'avatar',), [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -19,7 +19,7 @@ class AuthController extends Controller
             'phone' => 'required|numeric|max:999999999',
             'city' => 'required|string|max:255',
             'avatar' => 'string|max:255',
-            'user_type' => 'string|max:255',
+//            'role' => 'string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -27,16 +27,18 @@ class AuthController extends Controller
         }
 
         try {
-            $data = $request->only('email', 'fname','lname', 'password', 'avatar', 'user_type');
+            $data = $request->only('email', 'fname','lname', 'password', 'avatar', );
 
             $user = User::create([
+                'name'=> $data['fname'] . ' ' . $data['lname'],
                 'fname' => $data['fname'],
                 'lname' => $data['lname'],
                 'email' => $data['email'],
-                'user_type' => $data['user_type']?? 'customer',
                 'password' => Hash::make($data['password']),
                 'avatar' => $data['avatar'] ?? null,
             ]);
+
+            $user->assignRole('Customer','web');
 
             $user->contactDetails()->create([
                 'phone' => $request->phone,
@@ -70,7 +72,7 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
             $user = auth()->user();
-            // $roles = $user->getRoleNames();
+            $role = $user->getRoleNames();
             $token = $user->createToken('access')->accessToken;
             return response()->json(['data' => ['user' => $user, 'token' => $token]], 201);
         } catch (\Exception $e) {

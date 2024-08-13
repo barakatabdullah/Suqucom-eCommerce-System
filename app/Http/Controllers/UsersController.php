@@ -9,7 +9,7 @@ class UsersController extends Controller
 {
     public function getAll()
     {
-        $users = User::all();
+        $users = User::with('roles')->get();
 
         return response()->json(['data' => $users], 200);
     }
