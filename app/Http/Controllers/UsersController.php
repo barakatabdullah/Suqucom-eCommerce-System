@@ -13,4 +13,12 @@ class UsersController extends Controller
 
         return response()->json(['data' => $users], 200);
     }
+
+    public function getOne($id)
+    {
+        $user = User::with('roles')->find($id);
+
+        return response()->json(['data' => $user], 200);
+    }
+
 }

@@ -22,6 +22,7 @@ Route::middleware('auth:api')->group(function () {
      });
 
      Route::get('/users', [UsersController::class, 'getAll']);
+     Route::get('/users/{id}', [UsersController::class, 'getOne']);
 
      Route::get('/categories', [CategoriesController::class, 'getAll']);
      Route::post('/categories', [CategoriesController::class, 'create']);
