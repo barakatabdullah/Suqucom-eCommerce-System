@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ImagesController;
+use App\Http\Controllers\PermissionsController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -26,7 +27,8 @@ Route::middleware('auth:api')->group(function () {
      Route::get('/users/{id}', [UsersController::class, 'getOne']);
 
      Route::post('/images', [ImagesController::class, 'upload']);
-
+     Route::get('permissions', [PermissionsController::class, 'getAllPermissions']);
+     Route::get('roles', [PermissionsController::class, 'getAllRoles']);
      Route::get('/categories', [CategoriesController::class, 'getAll']);
      Route::post('/categories', [CategoriesController::class, 'create']);
 
