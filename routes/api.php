@@ -25,6 +25,7 @@ Route::middleware('auth:api')->group(function () {
 
      Route::get('/users', [UsersController::class, 'getAll']);
      Route::get('/users/{id}', [UsersController::class, 'getOne']);
+        Route::post('/users', [UsersController::class, 'create']);
 
      Route::post('/images', [ImagesController::class, 'upload']);
      Route::get('permissions', [PermissionsController::class, 'getAllPermissions']);
