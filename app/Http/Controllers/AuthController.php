@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
     public function create(Request $request)
     {
         // Get a validator for an incoming registration request.
-        $validator = validator($request->only('email', 'fname','lname','phone','city', 'password','role', "password_confirmation",'avatar',), [
+        $validator = validator($request->only('email', 'fname', 'lname', 'phone', 'city', 'password', 'role', "password_confirmation", 'avatar',), [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -26,10 +27,10 @@ class AuthController extends Controller
         }
 
         try {
-            $data = $request->only('email', 'fname','lname', 'password', 'avatar', );
+            $data = $request->only('email', 'fname', 'lname', 'password', 'avatar',);
 
             $user = User::create([
-                'name'=> $data['fname'] . ' ' . $data['lname'],
+                'name' => $data['fname'] . ' ' . $data['lname'],
                 'fname' => $data['fname'],
                 'lname' => $data['lname'],
                 'email' => $data['email'],
@@ -37,7 +38,14 @@ class AuthController extends Controller
                 'avatar' => $data['avatar'] ?? null,
             ]);
 
-            $user->assignRole('Customer','web');
+            // Attempt to find the role by its name
+            try {
+                $role = Role::where('name', 'Customer')->firstOrFail();
+            } catch (\Exception $e) {
+                // Handle the case where the role does not exist
+                return response()->json(['error' => 'Role not found.'], 404);
+            }
+            $user->assignRole($role);
 
             $user->contactDetails()->create([
                 'phone' => $request->phone,
