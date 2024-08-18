@@ -18,7 +18,8 @@ class UsersController extends Controller
 
     public function getOne($id)
     {
-        $user = User::with(['roles', 'permissions'])->find($id);
+        $user = User::with('roles')->find($id);
+        $user->avatar = $user->getAvatarUrlAttribute();
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
