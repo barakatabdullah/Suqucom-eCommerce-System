@@ -9,11 +9,15 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
-    use HasApiTokens,HasFactory, Notifiable,HasRoles;
+    use HasApiTokens,HasFactory, Notifiable,HasRoles,InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -26,7 +30,6 @@ class User extends Authenticatable
         'lname',
         'email',
         'password',
-        'avatar'
     ];
 
     /**
@@ -52,16 +55,18 @@ class User extends Authenticatable
         ];
     }
 
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this
+            ->addMediaConversion('preview')
+            ->fit(Fit::Contain, 300, 300)
+            ->nonQueued();
+    }
+
     public function contactDetails()
     {
         return $this->hasOne(ContactDetails::class);
     }
-
-    public function getAvatarUrlAttribute()
-    {
-        return $this->avatar ? url('storage/' . $this->avatar) : null;
-    }
-
 
 }
 

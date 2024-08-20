@@ -11,15 +11,14 @@ class UsersController extends Controller
 {
     public function getAll()
     {
-        $users = User::with('roles')->get();
-        $users->each(fn($user) => $user->avatar = $user->getAvatarUrlAttribute());
+        $users = User::with('roles','media')->get();
         return response()->json(['data' => $users], 200);
     }
 
     public function getOne($id)
     {
-        $user = User::with('roles')->find($id);
-        $user->avatar = $user->getAvatarUrlAttribute();
+        $user = User::with('roles','media')->find($id);
+
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
@@ -46,8 +45,6 @@ class UsersController extends Controller
         try {
             $data = $request->only('email', 'fname','lname', 'password', 'avatar', 'role', 'permissions');
 
-            $imageName = time().'.'.$request->avatar->extension();
-            $imagePath = $request->file('avatar')->storeAs('images', $imageName, 'public');
 
             $user = User::create([
                 'name'=> $data['fname'] . ' ' . $data['lname'],
@@ -55,8 +52,10 @@ class UsersController extends Controller
                 'lname' => $data['lname'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'avatar' => $imagePath ?? null,
+
             ]);
+
+            $user->addMediaFromRequest('avatar')->toMediaCollection('avatars');
 
             $role = Role::findOrFail($data['role']);
             $user->assignRole($role);
@@ -68,7 +67,7 @@ class UsersController extends Controller
 
             return response()->json(['data' => $user], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred while creating the user. Please try again.'], 500);
         }
 
 
