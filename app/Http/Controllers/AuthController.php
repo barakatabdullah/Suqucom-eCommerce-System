@@ -6,13 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 
 class AuthController extends Controller
 {
     public function create(Request $request)
     {
-        // Get a validator for an incoming registration request.
-        $validator = validator($request->only('email', 'fname', 'lname', 'phone', 'city', 'password', 'role', "password_confirmation", 'avatar',), [
+        $validator = validator($request->only('email', 'fname', 'lname', 'phone', 'city', 'password', "password_confirmation", 'avatar',), [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -38,13 +39,12 @@ class AuthController extends Controller
                 'avatar' => $data['avatar'] ?? null,
             ]);
 
-            // Attempt to find the role by its name
             try {
                 $role = Role::where('name', 'Customer')->firstOrFail();
-            } catch (\Exception $e) {
-                // Handle the case where the role does not exist
+            } catch (ModelNotFoundException $e) {
                 return response()->json(['error' => 'Role not found.'], 404);
             }
+
             $user->assignRole($role);
 
             $user->contactDetails()->create([
@@ -55,8 +55,10 @@ class AuthController extends Controller
             $token = $user->createToken('access')->accessToken;
 
             return response()->json(['data' => ['user' => $user, 'token' => $token]], 201);
+        } catch (QueryException $e) {
+            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'General error: ' . $e->getMessage()], 500);
         }
     }
 
@@ -68,8 +70,7 @@ class AuthController extends Controller
         ]);
 
         if ($valid->fails()) {
-            $jsonError = response()->json($valid->errors()->all(), 400);
-            return response()->json($jsonError);
+            return response()->json($valid->errors()->all(), 400);
         }
 
         try {
@@ -78,12 +79,22 @@ class AuthController extends Controller
             if (!$token = auth()->attempt($credentials)) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
+
             $user = auth()->user();
             $role = $user->getRoleNames();
             $token = $user->createToken('access')->accessToken;
+
             return response()->json(['data' => ['user' => $user, 'token' => $token]], 201);
+        } catch (QueryException $e) {
+            return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {
-            return response()->json($e->getMessage(), 500);
+            return response()->json(['error' => 'General error: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out'], 200);
     }
 }
