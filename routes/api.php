@@ -13,10 +13,8 @@ use App\Http\Controllers\PermissionsController;
 //     return $request->user();
 // })->middleware('auth:api');
 
-
 Route::post('/register', [AuthController::class, 'create']);
 Route::post('/login', [AuthController::class, 'login']);
-
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
@@ -30,11 +28,13 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/users/{id}', [UsersController::class, 'delete']);
 
     Route::post('/images', [ImagesController::class, 'upload']);
-    Route::get('permissions', [PermissionsController::class, 'getAllPermissions']);
-    Route::get('roles', [PermissionsController::class, 'getAllRoles']);
+    Route::get('/permissions', [PermissionsController::class, 'getAllPermissions']);
+    Route::get('/roles', [PermissionsController::class, 'getAllRoles']);
     Route::get('/categories', [CategoriesController::class, 'getAll']);
     Route::post('/categories', [CategoriesController::class, 'create']);
 
-    Route::get('products', [ProductsController::class, 'getAll']);
-    Route::post('products', [ProductsController::class, 'create']);
+    Route::get('/products', [ProductsController::class, 'getAll']);
+    Route::post('/products', [ProductsController::class, 'create']);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
