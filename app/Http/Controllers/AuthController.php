@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     public function create(Request $request)
     {
-        $validator = validator($request->only('email', 'fname', 'lname', 'phone', 'city', 'password', "password_confirmation", 'avatar',), [
+        $validator = validator($request->only('email', 'fname', 'lname', 'phone', 'city', 'password', "password_confirmation", 'avatar'), [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -28,7 +28,7 @@ class AuthController extends Controller
         }
 
         try {
-            $data = $request->only('email', 'fname', 'lname', 'password', 'avatar',);
+            $data = $request->only('email', 'fname', 'lname', 'password', 'avatar');
 
             $user = User::create([
                 'name' => $data['fname'] . ' ' . $data['lname'],
@@ -97,4 +97,5 @@ class AuthController extends Controller
         auth()->logout();
         return response()->json(['message' => 'Successfully logged out'], 200);
     }
+
 }
