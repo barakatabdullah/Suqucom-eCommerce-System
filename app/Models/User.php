@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -17,7 +18,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class User extends Authenticatable implements HasMedia
 {
-    use HasApiTokens,HasFactory, Notifiable,HasRoles,InteractsWithMedia;
+    use HasApiTokens,HasFactory, Notifiable,HasRoles,InteractsWithMedia,CanResetPassword;
 
     /**
      * The attributes that are mass assignable.
