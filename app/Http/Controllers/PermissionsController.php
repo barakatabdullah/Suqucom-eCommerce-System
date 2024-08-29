@@ -17,10 +17,20 @@ class PermissionsController extends Controller
 
     public function getAllRoles()
     {
-        $roles=Role::all();
+        $roles=Role::with('permissions')->get();
 
         return response()->json(['data' => $roles], 200);
     }
 
+    public function assignPermissionsToRole(Request $request, $role_id)
+    {
+        $role = Role::find($role_id);
+        $permissions = Permission::whereIn('id', $request->permission_ids)->get();
+
+        $role->syncPermissions($permissions);
+
+        return response()->json(['data' => 'Permissions assigned to role'], 200);
+
+    }
 
 }
