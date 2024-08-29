@@ -17,19 +17,50 @@ class PermissionsController extends Controller
 
     public function getAllRoles()
     {
-        $roles=Role::with('permissions')->get();
+        $roles = Role::with('permissions')->get();
 
         return response()->json(['data' => $roles], 200);
     }
 
-    public function assignPermissionsToRole(Request $request, $role_id)
+    public function getRole($role_id)
     {
-        $role = Role::find($role_id);
-        $permissions = Permission::whereIn('id', $request->permission_ids)->get();
+        $role = Role::with('permissions')->find($role_id);
 
-        $role->syncPermissions($permissions);
+        return response()->json(['data' => $role], 200);
+    }
 
-        return response()->json(['data' => 'Permissions assigned to role'], 200);
+    public function updateRoleWithPermissions(Request $request, $role_id)
+    {
+        $validator = validator($request->only('name', 'guard_name', 'permission_ids'), [
+            'name' => 'required|string|max:255',
+            'guard_name' => 'required|string|max:255',
+            'permission_ids' => 'array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        try {
+            $role = Role::find($role_id);
+
+            $role->update([
+                'name' => $request->name,
+                'guard_name' => $request->guard_name,
+            ]);
+
+
+            $permissions = Permission::whereIn('id', $request->permission_ids)->get();
+
+            $role->syncPermissions($permissions);
+
+            return response()->json(['data' => 'Permissions assigned to role'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Role not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
 
     }
 
