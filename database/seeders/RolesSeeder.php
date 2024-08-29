@@ -18,10 +18,10 @@ class RolesSeeder extends Seeder
 
 
         // Create main roles
-        Role::findOrCreate('super-admin');
-        Role::findOrCreate('admin');
-        Role::findOrCreate('customer');
-        Role::findOrCreate('seller');
-        Role::findOrCreate('affiliate');
+        Role::findOrCreate('super-admin','api');
+        Role::findOrCreate('admin','api');
+        Role::findOrCreate('customer','api');
+        Role::findOrCreate('seller','api');
+        Role::findOrCreate('affiliate','api');
     }
 }

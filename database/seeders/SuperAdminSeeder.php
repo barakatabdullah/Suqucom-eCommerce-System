@@ -16,7 +16,7 @@ class SuperAdminSeeder extends Seeder
     {
 
         // Ensure the Super-Admin role exists
-        $role = Role::findOrCreate('super-admin');
+        $role = Role::findOrCreate('super-admin','api');
 
         $user = User::updateOrCreate(
             ['email' => 's-admin@suqu.com'],
