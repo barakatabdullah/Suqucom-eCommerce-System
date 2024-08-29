@@ -56,6 +56,8 @@ class User extends Authenticatable implements HasMedia
         ];
     }
 
+    protected function getDefaultGuardName(): string { return 'api'; }
+
     public function registerMediaConversions(?Media $media = null): void
     {
         $this

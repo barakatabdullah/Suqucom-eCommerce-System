@@ -18,50 +18,75 @@ class PermissionsSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create permissions
+        // Define categorized permissions
         $permissions = [
-            'manage products',
-            'create products',
-            'edit products',
-            'delete products',
-            'view products',
-            'manage orders',
-            'create orders',
-            'edit orders',
-            'delete orders',
-            'view orders',
-            'manage categories',
-            'create categories',
-            'edit categories',
-            'delete categories',
-            'view categories',
-            'manage users',
-            'create users',
-            'edit users',
-            'delete users',
-            'view users',
-            'manage settings',
-            'view dashboard',
-            'manage affiliates',
-            'create affiliates',
-            'edit affiliates',
-            'delete affiliates',
-            'view affiliates',
-            'manage affiliate commissions',
-            'create affiliate commissions',
-            'edit affiliate commissions',
-            'delete affiliate commissions',
-            'view affiliate commissions',
+            'roles' => [
+                'manage roles',
+                'create roles',
+                'edit roles',
+                'delete roles',
+                'view roles',
+            ],
+            'products' => [
+                'manage products',
+                'create products',
+                'edit products',
+                'delete products',
+                'view products',
+            ],
+            'orders' => [
+                'manage orders',
+                'create orders',
+                'edit orders',
+                'delete orders',
+                'view orders',
+            ],
+            'categories' => [
+                'manage categories',
+                'create categories',
+                'edit categories',
+                'delete categories',
+                'view categories',
+            ],
+            'users' => [
+                'manage users',
+                'create users',
+                'edit users',
+                'delete users',
+                'view users',
+            ],
+            'settings' => [
+                'manage settings',
+                'view dashboard',
+            ],
+            'affiliates' => [
+                'manage affiliates',
+                'create affiliates',
+                'edit affiliates',
+                'delete affiliates',
+                'view affiliates',
+                'manage affiliate commissions',
+                'create affiliate commissions',
+                'edit affiliate commissions',
+                'delete affiliate commissions',
+                'view affiliate commissions',
+            ],
+
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::create([
-                'name' => $permission,
-                'guard_name' => 'admin'
-            ]);
+        // Create permissions
+        foreach ($permissions as $category => $perms) {
+            foreach ($perms as $permission) {
+                if (!Permission::where('name', $permission)->exists()) {
+                    Permission::create([
+                        'name' => $permission,
+                        'guard_name' => 'api'
+                    ]);
+                }
+            }
         }
 
-        Role::create(['name' => 'Super-Admin']);
+
 
 
     }

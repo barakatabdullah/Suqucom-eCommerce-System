@@ -16,15 +16,17 @@ class SuperAdminSeeder extends Seeder
     {
 
         // Ensure the Super-Admin role exists
-        $role = Role::firstOrCreate(['name' => 'Super-Admin']);
+        $role = Role::findOrCreate('super-admin');
 
-        $user = User::factory()->create([
-            'fname' => 'Super',
-            'lname' => 'Admin',
-            'email' => 's-admin@suqu.com',
-            'password' => bcrypt('s-pa$$W0rd'),
-            'email_verified_at' => now(),
-        ]);
+        $user = User::updateOrCreate(
+            ['email' => 's-admin@suqu.com'],
+            [
+                'fname' => 'Super',
+                'lname' => 'Admin',
+                'password' => bcrypt('s-pa$$W0rd'),
+                'email_verified_at' => now(),
+            ]
+        );
 
         $user->assignRole($role);
 

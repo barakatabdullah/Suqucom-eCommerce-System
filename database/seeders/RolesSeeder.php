@@ -13,9 +13,15 @@ class RolesSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create(['name' => 'Admin']);
-        Role::create(['name' => 'Customer']);
-        Role::create(['name' => 'Affiliate']);
+        // Delete all existing roles
+        Role::query()->delete();
 
+
+        // Create main roles
+        Role::findOrCreate('super-admin');
+        Role::findOrCreate('admin');
+        Role::findOrCreate('customer');
+        Role::findOrCreate('seller');
+        Role::findOrCreate('affiliate');
     }
 }
