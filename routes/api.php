@@ -33,8 +33,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/images', [ImagesController::class, 'upload']);
     Route::get('/permissions', [PermissionsController::class, 'getAllPermissions']);
     Route::get('/roles', [PermissionsController::class, 'getAllRoles']);
+    Route::post('/roles', [PermissionsController::class, 'createRoleWithPermissions']);
     Route::get('/roles/{role_id}', [PermissionsController::class, 'getRole']);
     Route::post('/roles/{role_id}', [PermissionsController::class, 'updateRoleWithPermissions']);
+    Route::delete('/roles/{role_id}', [PermissionsController::class, 'deleteRole']);
     Route::get('/categories', [CategoriesController::class, 'getAll']);
     Route::post('/categories', [CategoriesController::class, 'create']);
 
