@@ -25,7 +25,7 @@ class CategoriesController extends Controller
             'published' => 'boolean',
             'icon' => 'string|max:255',
             'color' => 'string|max:255',
-            'parent_id' => 'numeric',
+            'parent_id' => 'numeric|nullable',
         ]);
 
         if ($validator->fails()) {
