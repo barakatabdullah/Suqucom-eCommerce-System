@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -96,6 +97,9 @@ class PermissionsController extends Controller
 
     public function deleteRole($role_id)
     {
+//        if(Auth::user()->cannot('delete roles')){
+//            return response()->json( 'You do not have permission to delete roles.', 403);
+//        }
         $role = Role::find($role_id);
 
         if (!$role) {

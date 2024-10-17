@@ -111,6 +111,10 @@ class UsersController extends Controller
                 $user->addMediaFromRequest('avatar')->toMediaCollection('avatars');
             }
 
+
+
+
+
             $role = Role::findOrFail($data['role']);
             $user->syncRoles([$role]);
 
