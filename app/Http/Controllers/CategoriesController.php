@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CategoryResource;
 use Illuminate\Http\Request;
 use App\Models\Category;
 
 class CategoriesController extends Controller
 {
-    public function getAll()
+    public function getAll(Request $request)
     {
         $categories = Category::all();
 
-        return response()->json(['data' => $categories], 200);
+        return $this->ApiResponseFormatted(200,CategoryResource::collection($categories),'success',$request);
     }
 
     public function create(Request $request)
@@ -19,7 +20,7 @@ class CategoriesController extends Controller
         $validator = validator($request->only('name', 'slug', 'image', 'active', 'order', 'published', 'icon', 'color', 'parent_id'), [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
-            'image' => 'string|max:255',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'active' => 'boolean',
             'order' => 'numeric',
             'published' => 'boolean',
@@ -29,17 +30,23 @@ class CategoriesController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return $this->ApiResponseFormatted(400,null,$validator->errors()->first(),$request);
         }
 
         try {
-            $data = $request->only('name', 'slug', 'image', 'active', 'order', 'published', 'icon', 'color', 'parent_id');
+            $data = $request->only('name', 'slug', 'active', 'order', 'published', 'parent_id');
 
             $category = Category::create($data);
 
-            return response()->json(['data' => $category], 201);
+            if($request->has('image')){
+                $path = $request->file('image')->store('images', 'public');
+                $category->image = $path;
+                $category->save();
+            }
+
+            return $this->ApiResponseFormatted(201,new CategoryResource($category),'success',$request);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return $this->ApiResponseFormatted(500,null,$e->getMessage(),$request);
         }
 
     }

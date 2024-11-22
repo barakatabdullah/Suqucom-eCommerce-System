@@ -13,17 +13,9 @@ abstract class Controller
 {
     use AuthorizesRequests, ValidatesRequests;
 
-
-    protected function ApiResponseFormatted($code = 401, $data = NULL, $message = "Unauthenticated",AppSettings $settings = null, Request $request = null): JsonResponse
+    protected function ApiResponseFormatted($code = 401, $data = NULL, $message = "Unauthenticated", Request $request = null): JsonResponse
     {
         $headers =[];
-
-        if($settings != null){
-            $headers["ios_app_active"] = $settings->ios_app_active;
-            $headers["android_app_active"] = $settings->android_app_active;
-            $headers["ios_min_app_version"] = $settings->ios_min_app_version;
-            $headers["android_min_app_version"] = $settings->android_min_app_version;
-        }
 
         if($request != null && $request->user() != null){
             /* @var $user User*/
