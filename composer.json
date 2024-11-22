@@ -11,7 +11,8 @@
         "laravel/tinker": "^2.9",
         "spatie/laravel-medialibrary": "^11.8",
         "spatie/laravel-permission": "^6.9",
-        "spatie/laravel-settings": "^3.4"
+        "spatie/laravel-settings": "^3.4",
+        "spatie/laravel-translatable": "^6.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -26,7 +27,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
