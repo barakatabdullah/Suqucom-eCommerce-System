@@ -12,13 +12,14 @@ class CategoriesController extends Controller
     {
         $categories = Category::all();
 
-        return $this->ApiResponseFormatted(200,CategoryResource::collection($categories),'success',$request);
+        return $this->ApiResponseFormatted(200, CategoryResource::collection($categories), 'success', $request);
     }
 
     public function create(Request $request)
     {
-        $validator = validator($request->only('name', 'slug', 'image', 'active', 'order', 'published', 'icon', 'color', 'parent_id'), [
-            'name' => 'required|string|max:255',
+        $validator = validator($request->only('name_ar','name_en', 'slug', 'image', 'active', 'order', 'published', 'icon', 'color', 'parent_id'), [
+            'name_ar' => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'active' => 'boolean',
@@ -30,23 +31,36 @@ class CategoriesController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->ApiResponseFormatted(400,null,$validator->errors()->first(),$request);
+            return $this->ApiResponseFormatted(400, null, $validator->errors()->first(), $request);
         }
 
         try {
-            $data = $request->only('name', 'slug', 'active', 'order', 'published', 'parent_id');
+            $categoryName = [
+                'ar' => $request->name_ar,
+                'en' => $request->name_en,
+            ];
 
-            $category = Category::create($data);
+            $category = Category::create([
+                'name' => $categoryName,
+                'slug' => $request->slug,
+                'active' => $request->active ?? 1,
+                'order' => $request->order ?? 0,
+                'published' => $request->published ?? 1,
+                'icon' => $request->icon,
+                'color' => $request->color,
+                'parent_id' => $request->parent_id,
+            ]);
 
-            if($request->has('image')){
+
+            if ($request->has('image')) {
                 $path = $request->file('image')->store('images', 'public');
                 $category->image = $path;
                 $category->save();
             }
 
-            return $this->ApiResponseFormatted(201,new CategoryResource($category),'success',$request);
+            return $this->ApiResponseFormatted(201, new CategoryResource($category), 'success', $request);
         } catch (\Exception $e) {
-            return $this->ApiResponseFormatted(500,null,$e->getMessage(),$request);
+            return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
         }
 
     }
