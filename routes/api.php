@@ -37,8 +37,16 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/roles/{role_id}', [PermissionsController::class, 'getRole']);
     Route::post('/roles/{role_id}', [PermissionsController::class, 'updateRoleWithPermissions']);
     Route::delete('/roles/{role_id}', [PermissionsController::class, 'deleteRole']);
-    Route::get('/categories', [CategoriesController::class, 'getAll']);
-    Route::post('/categories', [CategoriesController::class, 'create']);
+
+
+    Route::controller(CategoriesController::class)->group(function () {
+        Route::get('/categories', 'getAll');
+        Route::post('/categories', 'create');
+        Route::get('/categories/{id}', 'getCategory');
+        Route::post('/categories/{id}', 'update');
+        Route::delete('/categories/{id}', 'delete');
+    });
+
 
     Route::get('/products', [ProductsController::class, 'getAll']);
     Route::post('/products', [ProductsController::class, 'create']);
