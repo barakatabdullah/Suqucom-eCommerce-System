@@ -84,7 +84,7 @@ class AuthController extends Controller
             $role = $user->getRoleNames();
             $token = $user->createToken('access')->accessToken;
 
-            return response()->json(['data' => ['user' => $user, 'token' => $token]], 201);
+            return $this->ApiResponseFormatted(200, ['user' => $user, 'role' => $role, 'token' => $token], 'success', $request);
         } catch (QueryException $e) {
             return response()->json(['error' => 'Database error: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {

@@ -47,9 +47,20 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/categories/{id}', 'delete');
     });
 
-
     Route::get('/products', [ProductsController::class, 'getAll']);
     Route::post('/products', [ProductsController::class, 'create']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+Route::controller(\App\Http\Controllers\AttributeController::class)->group(function () {
+    Route::get('/attributes', 'getAll');
+    Route::post('/attributes', 'create');
+    Route::get('/attributes/{id}', 'getOne');
+    Route::post('/attributes/{id}', 'update');
+    Route::delete('/attributes/{id}', 'delete');
+});
+
+Route::controller(\App\Http\Controllers\AttributeValueController::class)->group(function () {
+    Route::post('/attribute-values', 'create');
 });

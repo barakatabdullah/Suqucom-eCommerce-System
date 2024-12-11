@@ -14,6 +14,16 @@ return [
     'no_search_results' => 'No search results',
     'customer_not_found'=> 'Customer not found',
 
+
+    'not_found' => 'Not Found',
+
+
+    'created' => 'Created Successfully',
+
     'success' => 'Success',
+
+    "updated" => "Updated Successfully",
+
+    "deleted" => "Deleted Successfully",
 
 ];
