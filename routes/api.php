@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeValueController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Http\Request;
@@ -76,4 +77,12 @@ Route::controller(ColorController::class)->group(function () {
     Route::get('/colors/{id}', 'getColor');
     Route::post('/colors/{id}', 'update');
     Route::delete('/colors/{id}', 'delete');
+});
+
+Route::controller(BrandController::class)->group(function () {
+    Route::get('/brands', 'getBrands');
+    Route::post('/brands', 'create');
+    Route::get('/brands/{id}', 'getBrand');
+    Route::post('/brands/{id}', 'update');
+    Route::delete('/brands/{id}', 'delete');
 });

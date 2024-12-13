@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->json('name');
             $table->string('slug')->unique();
-            $table->string('image')->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
         });

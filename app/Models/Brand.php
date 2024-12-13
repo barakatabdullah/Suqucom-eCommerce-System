@@ -2,10 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Scopes\ActiveScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Translatable\HasTranslations;
 
-class Brand extends Model
+#[ScopedBy([ActiveScope::class])]
+class Brand extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasTranslations;
+    use InteractsWithMedia;
+
+    protected $fillable = ['name', 'image', 'active', 'meta_title', 'meta_description', 'slug'];
+
+    public $translatable = ['name', 'meta_title', 'meta_description'];
+
 }
