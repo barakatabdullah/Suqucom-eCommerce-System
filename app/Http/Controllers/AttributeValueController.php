@@ -44,4 +44,48 @@ class AttributeValueController extends Controller implements HasMiddleware
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'value' => 'required|string|max:255',
+        ]);
+
+        $attributeValue = AttributeValue::find($id);
+
+        if (!$attributeValue) {
+            return $this->ApiResponseFormatted(404, [], Lang::get('api.not_found'), $request);
+        }
+
+        try {
+            if ($attributeValue->value !== $validated['value']) {
+                $attributeValue->value = $validated['value'];
+                $attributeValue->save();
+            }
+
+            return $this->ApiResponseFormatted(200, AttributeValueResource::make($attributeValue), Lang::get('api.updated'), $request);
+        }catch (\Exception $e){
+            return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
+        }
+
+
+    }
+
+    public function delete(Request $request,$id)
+    {
+        $attributeValue = AttributeValue::find($id);
+
+        if (!$attributeValue) {
+            return $this->ApiResponseFormatted(404, null, Lang::get('api.not_found'), $request);
+        }
+
+        try {
+            $attributeValue->delete();
+            return $this->ApiResponseFormatted(200, null, Lang::get('api.deleted'), $request);
+        }catch (\Exception $e){
+            return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
+        }
+    }
+
+
+
 }

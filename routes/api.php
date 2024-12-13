@@ -63,4 +63,7 @@ Route::controller(\App\Http\Controllers\AttributeController::class)->group(funct
 
 Route::controller(\App\Http\Controllers\AttributeValueController::class)->group(function () {
     Route::post('/attribute-values', 'create');
+    Route::post('/attribute-values/{id}', 'update');
+    Route::delete('/attribute-values/{id}', 'delete');
+
 });

@@ -19,6 +19,7 @@ class AttributeResource extends JsonResource
             "name" => $this->name,
             "name_ar" => $this->getTranslation("name", "ar"),
             "name_en" => $this->getTranslation("name", "en"),
+            "attribute_values" => AttributeValueResource::collection($this->attributeValues),
         ];
     }
 }

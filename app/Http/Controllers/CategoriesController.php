@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CategoryResource;
-use App\Models\Scopes\CategoryActiveScope;
+use App\Models\Scopes\ActiveScope;
 use Illuminate\Http\Request;
 use App\Models\Category;
 
@@ -11,14 +11,14 @@ class CategoriesController extends Controller
 {
     public function getAll(Request $request)
     {
-        $categories = Category::query()->withoutGlobalScope(CategoryActiveScope::class)->orderBy('order')->get();
+        $categories = Category::query()->withoutGlobalScope(ActiveScope::class)->orderBy('order')->get();
 
         return $this->ApiResponseFormatted(200, CategoryResource::collection($categories), 'success', $request);
     }
 
     public function getCategory(Request $request, $id)
     {
-        $category = Category::query()->withoutGlobalScope(CategoryActiveScope::class)->find($id);
+        $category = Category::query()->withoutGlobalScope(ActiveScope::class)->find($id);
         if ($category == null) {
             return $this->ApiResponseFormatted(404, null, 'Category not found', $request);
         }
@@ -79,7 +79,7 @@ class CategoriesController extends Controller
 
     public function update(Request $request, $id)
     {
-        $category = Category::query()->withoutGlobalScope(CategoryActiveScope::class)->find($id);
+        $category = Category::query()->withoutGlobalScope(ActiveScope::class)->find($id);
         if ($category == null) {
             return $this->ApiResponseFormatted(404, null, 'Category not found', $request);
         }
@@ -131,7 +131,7 @@ class CategoriesController extends Controller
 
     public function delete(Request $request, $id)
     {
-        $category = Category::query()->withoutGlobalScope(CategoryActiveScope::class)->find($id);
+        $category = Category::query()->withoutGlobalScope(ActiveScope::class)->find($id);
         if ($category == null) {
             return $this->ApiResponseFormatted(404, null, 'Category not found', $request);
         }
