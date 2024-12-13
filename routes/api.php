@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AttributeController;
+use App\Http\Controllers\AttributeValueController;
+use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -53,7 +56,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-Route::controller(\App\Http\Controllers\AttributeController::class)->group(function () {
+Route::controller(AttributeController::class)->group(function () {
     Route::get('/attributes', 'getAll');
     Route::post('/attributes', 'create');
     Route::get('/attributes/{id}', 'getOne');
@@ -61,9 +64,16 @@ Route::controller(\App\Http\Controllers\AttributeController::class)->group(funct
     Route::delete('/attributes/{id}', 'delete');
 });
 
-Route::controller(\App\Http\Controllers\AttributeValueController::class)->group(function () {
+Route::controller(AttributeValueController::class)->group(function () {
     Route::post('/attribute-values', 'create');
     Route::post('/attribute-values/{id}', 'update');
     Route::delete('/attribute-values/{id}', 'delete');
+});
 
+Route::controller(ColorController::class)->group(function () {
+    Route::get('/colors', 'getColors');
+    Route::post('/colors', 'create');
+    Route::get('/colors/{id}', 'getColor');
+    Route::post('/colors/{id}', 'update');
+    Route::delete('/colors/{id}', 'delete');
 });
