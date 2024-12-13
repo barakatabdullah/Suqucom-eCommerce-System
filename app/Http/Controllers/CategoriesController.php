@@ -6,9 +6,14 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class CategoriesController extends Controller
+class CategoriesController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return ['auth:api'];
+    }
     public function getAll(Request $request)
     {
         $categories = Category::query()->withoutGlobalScope(ActiveScope::class)->orderBy('order')->get();

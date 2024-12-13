@@ -19,4 +19,10 @@ class Brand extends Model implements HasMedia
 
     public $translatable = ['name', 'meta_title', 'meta_description'];
 
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
 }

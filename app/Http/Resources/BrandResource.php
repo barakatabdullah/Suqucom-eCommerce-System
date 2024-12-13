@@ -19,7 +19,7 @@ class BrandResource extends JsonResource
             "name" => $this->name,
             "name_ar" => $this->getTranslation("name", "ar"),
             "name_en" => $this->getTranslation("name", "en"),
-             "active"=>$this->active,
+            "active" => $this->active,
             "meta_title" => $this->meta_title,
             "meta_title_ar" => $this->getTranslation("meta_title", "ar"),
             "meta_title_en" => $this->getTranslation("meta_title", "en"),

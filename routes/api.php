@@ -11,12 +11,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\UsersController;
-use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\PermissionsController;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:api');
 
 Route::post('/register', [AuthController::class, 'create']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -34,7 +30,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/users/{id}', [UsersController::class, 'update']);
     Route::delete('/users/{id}', [UsersController::class, 'delete']);
 
-    Route::post('/images', [ImagesController::class, 'upload']);
+//    Route::post('/images', [ImagesController::class, 'upload']);
     Route::get('/permissions', [PermissionsController::class, 'getAllPermissions']);
     Route::get('/roles', [PermissionsController::class, 'getAllRoles']);
     Route::post('/roles', [PermissionsController::class, 'createRoleWithPermissions']);
@@ -42,19 +38,15 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/roles/{role_id}', [PermissionsController::class, 'updateRoleWithPermissions']);
     Route::delete('/roles/{role_id}', [PermissionsController::class, 'deleteRole']);
 
-
-    Route::controller(CategoriesController::class)->group(function () {
-        Route::get('/categories', 'getAll');
-        Route::post('/categories', 'create');
-        Route::get('/categories/{id}', 'getCategory');
-        Route::post('/categories/{id}', 'update');
-        Route::delete('/categories/{id}', 'delete');
-    });
-
-    Route::get('/products', [ProductsController::class, 'getAll']);
-    Route::post('/products', [ProductsController::class, 'create']);
-
     Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+Route::controller(CategoriesController::class)->group(function () {
+    Route::get('/categories', 'getAll');
+    Route::post('/categories', 'create');
+    Route::get('/categories/{id}', 'getCategory');
+    Route::post('/categories/{id}', 'update');
+    Route::delete('/categories/{id}', 'delete');
 });
 
 Route::controller(AttributeController::class)->group(function () {
@@ -85,4 +77,12 @@ Route::controller(BrandController::class)->group(function () {
     Route::get('/brands/{id}', 'getBrand');
     Route::post('/brands/{id}', 'update');
     Route::delete('/brands/{id}', 'delete');
+});
+
+Route::controller(ProductsController::class)->group(function () {
+    Route::get('/products', 'getProducts');
+    Route::get('/products/{id}', 'getProduct');
+    Route::post('/products', 'create');
+    Route::post('/products/{id}', 'update');
+    Route::delete('/products/{id}', 'delete');
 });
