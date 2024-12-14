@@ -54,10 +54,6 @@ class Product extends Model implements HasMedia
         return $this->belongsToMany(Category::class, 'product_categories', 'product_id', 'category_id');
     }
 
-    public function images()
-    {
-        return $this->hasMany(Image::class, 'imageable_id')->where('imageable_type', 'App\Models\Product');
-    }
 
     public function reviews()
     {
