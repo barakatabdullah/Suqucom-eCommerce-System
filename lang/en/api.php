@@ -14,6 +14,8 @@ return [
     'no_search_results' => 'No search results',
     'customer_not_found'=> 'Customer not found',
 
+    "order_created" => "Order Created Successfully",
+
 
     'not_found' => 'Not Found',
 
@@ -25,5 +27,7 @@ return [
     "updated" => "Updated Successfully",
 
     "deleted" => "Deleted Successfully",
+
+    "error" => "Error",
 
 ];

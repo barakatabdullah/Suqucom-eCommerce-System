@@ -71,6 +71,11 @@ class User extends Authenticatable implements HasMedia
         return $this->hasOne(ContactDetails::class);
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
 }
 
 

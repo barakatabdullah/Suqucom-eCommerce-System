@@ -13,6 +13,8 @@ return [
     'no_search_results' => 'لا توجد نتائج بحث',
     'customer_not_found'=> 'العميل غير موجود',
 
+    "order_created" => "تم إنشاء الطلب بنجاح",
+
     'not_found' => 'غير موجود',
 
     'created' => 'تم الإنشاء بنجاح',
@@ -22,5 +24,9 @@ return [
     "updated" => "تم التحديث بنجاح",
 
     "deleted" => "تم الحذف بنجاح",
+
+    "error" => "خطأ",
+
+
 
 ];

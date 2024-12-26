@@ -55,11 +55,16 @@ class Product extends Model implements HasMedia
     }
 
 
-    public function reviews()
+    public function ratings()
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Rating::class);
     }
 
+
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
 
 
 

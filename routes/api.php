@@ -4,6 +4,7 @@ use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeValueController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ColorController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -84,4 +85,12 @@ Route::controller(ProductsController::class)->group(function () {
     Route::post('/products', 'create');
     Route::post('/products/{id}', 'update');
     Route::delete('/products/{id}', 'delete');
+});
+
+Route::controller(OrderController::class)->group(function () {
+    Route::get('/orders', 'getAll');
+    Route::get('/orders/{id}', 'getOrder');
+    Route::post('/orders', 'create');
+    Route::put('/orders/{id}', 'update');
+    Route::delete('/orders/{id}', 'delete');
 });
