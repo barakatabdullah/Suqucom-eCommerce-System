@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\OrderDetailsResource;
 use App\Http\Resources\OrderResource;
-use App\Http\Resources\UserResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -27,7 +25,7 @@ class OrderController extends Controller implements HasMiddleware
     {
         $order = Order::find($id);
         if ($order == null) {
-            return $this->ApiResponseFormatted(404, null, Lang::get('api.order_not_found'), $request);
+            return $this->ApiResponseFormatted(404, null, Lang::get('api.not_found'), $request);
         }
         return $this->ApiResponseFormatted(200, OrderResource::make($order), Lang::get('api.success'), $request);
     }
@@ -110,7 +108,7 @@ class OrderController extends Controller implements HasMiddleware
                 ]);
             }
 
-            return $this->ApiResponseFormatted(200, OrderResource::make($order), Lang::get('api.order_updated'), $request);
+            return $this->ApiResponseFormatted(200, OrderResource::make($order), Lang::get('api.updated'), $request);
         } catch (\Exception $e) {
             return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
         }
@@ -120,13 +118,13 @@ class OrderController extends Controller implements HasMiddleware
     {
         $order = Order::find($id);
         if ($order == null) {
-            return $this->ApiResponseFormatted(404, null, Lang::get('api.order_not_found'), $request);
+            return $this->ApiResponseFormatted(404, null, Lang::get('api.not_found'), $request);
         }
 
         try {
             $order->orderDetails()->delete();
             $order->delete();
-            return $this->ApiResponseFormatted(200, null, Lang::get('api.order_deleted'), $request);
+            return $this->ApiResponseFormatted(200, null, Lang::get('api.deleted'), $request);
         } catch (\Exception $e) {
             return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
         }
