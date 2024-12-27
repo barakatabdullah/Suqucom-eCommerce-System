@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeValueController;
 use App\Http\Controllers\BrandController;
@@ -41,6 +42,14 @@ Route::controller(AuthController::class)->group(function () {
 Route::group(['prefix' => 'admin'], function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('/login', 'adminLogin');
+    });
+
+    Route::controller(AdminController::class)->group(function () {
+        Route::get('/admins', 'getAll');
+        Route::get('/admins/{id}', 'getOne');
+        Route::post('/admins', 'create');
+        Route::put('/admins/{id}', 'update');
+        Route::delete('/admins/{id}', 'delete');
     });
 });
 
