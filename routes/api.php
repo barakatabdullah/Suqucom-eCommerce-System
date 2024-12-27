@@ -20,26 +20,48 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot', [ResetPasswordController::class, 'forgot']);
 Route::post('/reset', [ResetPasswordController::class, 'reset']);
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:admin')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
-    Route::get('/users', [UsersController::class, 'getAll']);
-    Route::get('/users/{id}', [UsersController::class, 'getOne']);
-    Route::post('/users', [UsersController::class, 'create']);
-    Route::put('/users/{id}', [UsersController::class, 'update']);
-    Route::delete('/users/{id}', [UsersController::class, 'delete']);
 
-    Route::get('/permissions', [PermissionsController::class, 'getAllPermissions']);
-    Route::get('/roles', [PermissionsController::class, 'getAllRoles']);
-    Route::post('/roles', [PermissionsController::class, 'createRoleWithPermissions']);
-    Route::get('/roles/{role_id}', [PermissionsController::class, 'getRole']);
-    Route::post('/roles/{role_id}', [PermissionsController::class, 'updateRoleWithPermissions']);
-    Route::delete('/roles/{role_id}', [PermissionsController::class, 'deleteRole']);
-
-    Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+
+Route::controller(AuthController::class)->group(function () {
+    Route::post('/login', 'login');
+    Route::post('/register', 'create');
+    Route::post('/forgot', 'forgot');
+    Route::post('/reset', 'reset');
+    Route::post('/logout', 'logout');
+
+});
+
+Route::group(['prefix' => 'admin'], function () {
+    Route::controller(AuthController::class)->group(function () {
+        Route::post('/login', 'adminLogin');
+    });
+});
+
+
+Route::controller(UsersController::class)->group(function () {
+    Route::get('/users', 'getAll');
+    Route::get('/users/{id}', 'getOne');
+    Route::post('/users', 'create');
+    Route::put('/users/{id}', 'update');
+    Route::delete('/users/{id}', 'delete');
+});
+
+Route::controller(PermissionsController::class)->group(function () {
+    Route::get('/permissions', 'getAllPermissions');
+    Route::get('/roles', 'getAllRoles');
+    Route::post('/roles', 'createRoleWithPermissions');
+    Route::get('/roles/{role_id}', 'getRole');
+    Route::post('/roles/{role_id}', 'updateRoleWithPermissions');
+    Route::delete('/roles/{role_id}', 'deleteRole');
+});
+
 
 Route::controller(CategoriesController::class)->group(function () {
     Route::get('/categories', 'getAll');

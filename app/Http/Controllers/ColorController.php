@@ -12,7 +12,7 @@ class ColorController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
-        return ['auth:api'];
+        return ['auth:admin'];
     }
 
     public function getColors(Request $request)

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
-use App\Models\Image;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -13,7 +12,7 @@ class ProductsController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
-        return ['auth:api'];
+        return ['auth:admin'];
     }
     public function getProducts(Request $request)
     {

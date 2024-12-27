@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
-class ResetPasswordController extends Controller
+class ResetPasswordController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return ['auth:user'];
+    }
     public function forgot(Request $request): \Illuminate\Http\JsonResponse
     {
             $validator = validator($request->only('email'), [

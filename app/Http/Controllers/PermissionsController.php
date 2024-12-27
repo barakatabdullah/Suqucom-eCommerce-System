@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class PermissionsController extends Controller
+class PermissionsController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return ['auth:admin'];
+    }
     public function getAllPermissions()
     {
         $permissions = Permission::all();

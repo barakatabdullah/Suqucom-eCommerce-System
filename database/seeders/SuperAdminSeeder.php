@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,19 +17,18 @@ class SuperAdminSeeder extends Seeder
     {
 
         // Ensure the Super-Admin role exists
-        $role = Role::findOrCreate('super-admin','api');
+        $role = Role::findOrCreate('super-admin','admin');
 
-        $user = User::updateOrCreate(
+        $admin = Admin::updateOrCreate(
             ['email' => 's-admin@suqu.com'],
             [
-                'fname' => 'Super',
-                'lname' => 'Admin',
+                'name' => 'Super',
                 'password' => bcrypt('s-pa$$W0rd'),
                 'email_verified_at' => now(),
             ]
         );
 
-        $user->assignRole($role);
+        $admin->assignRole($role);
 
 
     }

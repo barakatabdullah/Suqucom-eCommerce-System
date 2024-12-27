@@ -14,7 +14,7 @@ class AttributeValueController extends Controller implements HasMiddleware
 
     public static function middleware()
     {
-        return ['auth:api'];
+        return ['auth:admin'];
     }
 
     public function create(Request $request)

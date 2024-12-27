@@ -14,7 +14,7 @@ class BrandController extends Controller implements HasMiddleware
 
     public static function middleware()
     {
-        return ['auth:api'];
+        return ['auth:admin'];
     }
 
     public function getBrands(Request $request)

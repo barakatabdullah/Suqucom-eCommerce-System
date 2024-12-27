@@ -12,7 +12,7 @@ class AttributeController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
-        return ['auth:api'];
+        return ['auth:admin'];
     }
     public function getAll(Request $request)
     {

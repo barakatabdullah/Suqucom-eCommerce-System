@@ -80,7 +80,7 @@ class PermissionsSeeder extends Seeder
                 if (!Permission::where('name', $permission)->exists()) {
                     Permission::create([
                         'name' => $permission,
-                        'guard_name' => 'api'
+                        'guard_name' => 'admin'
                     ]);
                 }
             }

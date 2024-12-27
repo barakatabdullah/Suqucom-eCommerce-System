@@ -4,13 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 
-class AuthController extends Controller
+class AuthController extends Controller implements HasMiddleware
 {
+
+    public static function middleware()
+    {
+        return [
+//'auth:admin', 'only' => ['logout']
+        ];
+    }
+
     public function create(Request $request)
     {
         $validator = validator($request->only('email', 'fname', 'lname', 'phone', 'city', 'password', "password_confirmation", 'avatar'), [
@@ -92,10 +101,34 @@ class AuthController extends Controller
         }
     }
 
-    public function logout()
+    public function adminLogin(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:8',
+        ]);
+
+
+
+        try {
+            $credentials = $request->only(['email', 'password']);
+            if (!auth()->attempt($credentials)) {
+                return $this->ApiResponseFormatted(401, null, \Lang::get('api.unauthorized'), $request);
+            }
+            $user = auth()->user();
+            $role = $user->getRoleNames();
+            $token = $user->createToken('access')->accessToken;
+            return $this->ApiResponseFormatted(200, ['user' => $user, 'role' => $role, 'token' => $token], 'success', $request);
+        } catch (QueryException $e) {
+            return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
+        } catch (\Exception $e) {
+            return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
+        }
+    }
+    public function logout(Request $request)
     {
         auth()->logout();
-        return response()->json(['message' => 'Successfully logged out'], 200);
+        return $this->ApiResponseFormatted(200, null, \Lang::get('api.success'), $request);
     }
 
 }

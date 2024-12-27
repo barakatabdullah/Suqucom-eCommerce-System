@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
-class UsersController extends Controller
+class UsersController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return ['auth:admin'];
+    }
     public function getAll()
     {
         $users = User::with('roles', 'media')->get();
