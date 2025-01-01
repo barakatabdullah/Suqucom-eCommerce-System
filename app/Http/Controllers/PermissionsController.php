@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PermissionResource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
+use Lang;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -14,11 +16,11 @@ class PermissionsController extends Controller implements HasMiddleware
     {
         return ['auth:admin'];
     }
-    public function getAllPermissions()
+    public function getAllPermissions(Request $request)
     {
         $permissions = Permission::all();
 
-        return response()->json(['data' => $permissions], 200);
+        return $this->ApiResponseFormatted(200,PermissionResource::collection($permissions), Lang::get('api.success'), $request);
     }
 
     public function getAllRoles()
