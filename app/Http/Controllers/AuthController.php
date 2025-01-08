@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AdminResource;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -115,10 +116,10 @@ class AuthController extends Controller implements HasMiddleware
             if (!auth()->attempt($credentials)) {
                 return $this->ApiResponseFormatted(401, null, \Lang::get('api.unauthorized'), $request);
             }
-            $user = auth()->user();
-            $role = $user->getRoleNames();
-            $token = $user->createToken('access')->accessToken;
-            return $this->ApiResponseFormatted(200, ['user' => $user, 'role' => $role, 'token' => $token], 'success', $request);
+            $admin = auth()->user();
+            $role = $admin->getRoleNames();
+            $token = $admin->createToken('access')->accessToken;
+            return $this->ApiResponseFormatted(200, ['admin'=>AdminResource::make($admin),'token' => $token], 'success', $request);
         } catch (QueryException $e) {
             return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
         } catch (\Exception $e) {
