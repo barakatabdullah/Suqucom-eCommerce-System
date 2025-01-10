@@ -20,7 +20,7 @@ class AdminResource extends JsonResource
             "email"=>$this->email,
             "is_email_verified" => !!$this->email_verified_at,
             "active"=>$this->active,
-            "media"=> $this->media,
+            "avatar"=> appUrl($this->avatar_url),
             "roles"=>$this->roles,
         ];
     }

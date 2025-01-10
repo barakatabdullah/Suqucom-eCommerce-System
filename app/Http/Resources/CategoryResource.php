@@ -21,7 +21,7 @@ class CategoryResource extends JsonResource
             'name_ar'=> $this->getTranslation("name", "ar"),
             'name_en'=> $this->getTranslation("name", "en"),
             'slug' => $this->slug,
-            'image' => appUrl($this->image ),
+            'image' => appUrl($this->image),
             'active' => $this->active,
             'order' => $this->order,
             'published' => $this->published,

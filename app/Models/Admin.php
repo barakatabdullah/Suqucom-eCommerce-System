@@ -19,6 +19,8 @@ class Admin extends Authenticatable implements HasMedia
     use HasApiTokens,HasFactory, Notifiable,HasRoles,InteractsWithMedia,CanResetPassword;
 
 
+    protected $guard = 'admin';
+
     protected $fillable = [
         'name',
         'email',

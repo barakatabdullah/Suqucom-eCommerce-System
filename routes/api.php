@@ -21,14 +21,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot', [ResetPasswordController::class, 'forgot']);
 Route::post('/reset', [ResetPasswordController::class, 'reset']);
 
-Route::middleware('auth:admin')->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
-
-});
-
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
@@ -41,7 +33,11 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::group(['prefix' => 'admin'], function () {
     Route::controller(AuthController::class)->group(function () {
+        Route::get('/', function (Request $request) {
+            return $request->user();
+        })->middleware('auth:admin');
         Route::post('/login', 'adminLogin');
+        Route::post('/logout', 'logoutAdmin');
     });
 
     Route::controller(AdminController::class)->group(function () {

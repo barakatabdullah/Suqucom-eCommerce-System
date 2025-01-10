@@ -6,6 +6,8 @@ use App\Http\Resources\AdminResource;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -17,7 +19,7 @@ class AuthController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-//'auth:admin', 'only' => ['logout']
+            new Middleware('auth:admin', only: ['logoutAdmin']),
         ];
     }
 
@@ -113,12 +115,14 @@ class AuthController extends Controller implements HasMiddleware
 
         try {
             $credentials = $request->only(['email', 'password']);
-            if (!auth()->attempt($credentials)) {
+            $admin = User::where('email', $credentials['email'])->first();
+
+            if (!$admin || !Hash::check($credentials['password'], $admin->password)) {
                 return $this->ApiResponseFormatted(401, null, \Lang::get('api.unauthorized'), $request);
             }
-            $admin = auth()->user();
-            $role = $admin->getRoleNames();
+
             $token = $admin->createToken('access')->accessToken;
+
             return $this->ApiResponseFormatted(200, ['admin'=>AdminResource::make($admin),'token' => $token], 'success', $request);
         } catch (QueryException $e) {
             return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
@@ -126,9 +130,9 @@ class AuthController extends Controller implements HasMiddleware
             return $this->ApiResponseFormatted(500, null, $e->getMessage(), $request);
         }
     }
-    public function logout(Request $request)
+    public function logoutAdmin(Request $request)
     {
-        auth()->logout();
+        $request->user()->token()->revoke();
         return $this->ApiResponseFormatted(200, null, \Lang::get('api.success'), $request);
     }
 
