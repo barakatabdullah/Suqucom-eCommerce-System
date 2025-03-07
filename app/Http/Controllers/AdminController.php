@@ -25,8 +25,18 @@ class AdminController extends Controller implements HasMiddleware
 
     public function getAll(Request $request)
     {
-        $admins = Admin::with('roles', 'media')->get();
-        return $this->ApiResponseFormatted(200, AdminResource::collection($admins), Lang::get('api.success'), $request);
+        $admins = Admin::with('roles', 'media')->paginate(20);
+       return $this->ApiResponseFormatted(200,
+             [
+            'data' => AdminResource::collection($admins),
+                 'meta' => [
+                     'current_page' => $admins->currentPage(),
+                     'last_page' => $admins->lastPage(),
+                     'per_page' => $admins->perPage(),
+                     'total' => $admins->total(),
+                 ]
+             ]
+        , Lang::get('api.success'), $request);
     }
 
     public function getOne(Request $request, $id)
@@ -67,7 +77,7 @@ class AdminController extends Controller implements HasMiddleware
 
     public function setLocale(Request $request)
     {
-        $validated=$request->validate([
+        $validated = $request->validate([
             'locale' => 'required|string|in:en,ar',
         ]);
 
@@ -75,7 +85,7 @@ class AdminController extends Controller implements HasMiddleware
         $model->locale = $validated['locale'];
         $model->save();
 
-        return $this->ApiResponseFormatted(200,null, Lang::get('api.updated'), $request);
+        return $this->ApiResponseFormatted(200, null, Lang::get('api.updated'), $request);
     }
 
     public function delete(Request $request, $id)
