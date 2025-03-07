@@ -6,6 +6,7 @@ use App\Http\Resources\AdminResource;
 use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Support\Facades\Auth;
 use Lang;
 
 class AdminController extends Controller implements HasMiddleware
@@ -14,6 +15,13 @@ class AdminController extends Controller implements HasMiddleware
     {
         return ['auth:admin'];
     }
+
+    public function getCurrentAdmin(Request $request)
+    {
+        $admin = Auth::guard('admin')->user();
+        return $this->ApiResponseFormatted(200, AdminResource::make($admin), Lang::get('api.success'), $request);
+    }
+
 
     public function getAll(Request $request)
     {
@@ -55,6 +63,19 @@ class AdminController extends Controller implements HasMiddleware
         ]);
         $admin->update($request->all());
         return $this->ApiResponseFormatted(200, new AdminResource($admin), Lang::get('api.updated'), $request);
+    }
+
+    public function setLocale(Request $request)
+    {
+        $validated=$request->validate([
+            'locale' => 'required|string|in:en,ar',
+        ]);
+
+        $model = $request->user();
+        $model->locale = $validated['locale'];
+        $model->save();
+
+        return $this->ApiResponseFormatted(200,null, Lang::get('api.updated'), $request);
     }
 
     public function delete(Request $request, $id)

@@ -33,19 +33,18 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::group(['prefix' => 'admin'], function () {
     Route::controller(AuthController::class)->group(function () {
-        Route::get('/', function (Request $request) {
-            return $request->user();
-        })->middleware('auth:admin');
         Route::post('/login', 'adminLogin');
         Route::post('/logout', 'logoutAdmin');
     });
 
     Route::controller(AdminController::class)->group(function () {
+        Route::get('/', 'getCurrentAdmin');
         Route::get('/admins', 'getAll');
         Route::get('/admins/{id}', 'getOne');
         Route::post('/admins', 'create');
         Route::put('/admins/{id}', 'update');
         Route::delete('/admins/{id}', 'delete');
+        Route::post('locale', 'setLocale');
     });
 });
 
