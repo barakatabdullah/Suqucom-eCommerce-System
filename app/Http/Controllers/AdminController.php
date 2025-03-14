@@ -25,18 +25,62 @@ class AdminController extends Controller implements HasMiddleware
 
     public function getAll(Request $request)
     {
-        $admins = Admin::with('roles', 'media')->paginate(20);
-       return $this->ApiResponseFormatted(200,
-             [
-            'data' => AdminResource::collection($admins),
-                 'meta' => [
-                     'current_page' => $admins->currentPage(),
-                     'last_page' => $admins->lastPage(),
-                     'per_page' => $admins->perPage(),
-                     'total' => $admins->total(),
-                 ]
-             ]
-        , Lang::get('api.success'), $request);
+        $request->validate([
+            'per_page' => 'sometimes|integer|min:1|max:100',
+            'page' => 'nullable|integer|min:1',
+            'sort_by' => 'nullable|string|in:id,name,email,created_at,updated_at',
+            'sort_direction' => 'nullable|string|in:asc,desc',
+            'search' => 'string|max:100|nullable',
+            'role' => 'nullable|string',
+            'active' => 'nullable|boolean',
+        ]);
+
+        $query = Admin::query()->with(['roles', 'media']);
+
+        // Filtering
+        if ($request->has('active')) {
+            $query->where('active', $request->active);
+        }
+
+        if ($request->has('role')) {
+            $query->whereHas('roles', function($q) use ($request) {
+                $q->where('name', $request->role);
+            });
+        }
+
+        // Search functionality
+        if ($request->has('search')) {
+            $searchTerm = "%{$request->search}%";
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', $searchTerm)
+                  ->orWhere('email', 'like', $searchTerm);
+            });
+        }
+
+        // Sorting
+        $sortBy = $request->get('sort_by', 'id');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $query->orderBy($sortBy, $sortDirection);
+
+        // Pagination
+        $perPage = $request->get('per_page', 2);
+        $admins = $query->paginate($perPage);
+
+        return $this->ApiResponseFormatted(
+            200,
+            [
+                'data' => AdminResource::collection($admins),
+                'meta' => [
+                    'current_page' => $admins->currentPage(),
+                    'last_page' => $admins->lastPage(),
+                    'per_page' => $admins->perPage(),
+                    'total' => $admins->total(),
+                    'filters' => $request->only(['search', 'role', 'active', 'sort_by', 'sort_direction']),
+                ]
+            ],
+            Lang::get('api.success'),
+            $request
+        );
     }
 
     public function getOne(Request $request, $id)
