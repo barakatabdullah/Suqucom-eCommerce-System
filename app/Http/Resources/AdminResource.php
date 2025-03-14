@@ -15,15 +15,15 @@ class AdminResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "id"=>$this->id,
-            "name"=>$this->name,
-            "email"=>$this->email,
+            "id" => $this->id,
+            "name" => $this->name,
+            "email" => $this->email,
             "is_email_verified" => !!$this->email_verified_at,
-            "locale"=>$this->locale,
-            "active"=>$this->active,
-            "avatar"=> appUrl($this->avatar_url),
-            "roles"=>RoleResource::collection($this->roles),
-            "created_at"=>$this->created_at,
+            "locale" => $this->locale,
+            "active" => !!$this->active,
+            "avatar" => $this->getFirstMediaUrl('avatars'),
+            "roles" => RoleResource::collection($this->roles),
+            "created_at" => $this->created_at,
         ];
     }
 }

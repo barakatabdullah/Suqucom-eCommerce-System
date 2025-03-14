@@ -42,29 +42,33 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/admins', 'getAll');
         Route::get('/admins/{id}', 'getOne');
         Route::post('/admins', 'create');
-        Route::put('/admins/{id}', 'update');
+        Route::post('/admins/{id}', 'update');
         Route::delete('/admins/{id}', 'delete');
         Route::post('locale', 'setLocale');
     });
+    Route::controller(PermissionsController::class)->group(function () {
+        Route::get('/permissions', 'getAllPermissions');
+        Route::get('/roles', 'getAllRoles');
+        Route::post('/roles', 'createRoleWithPermissions');
+        Route::get('/roles/{role_id}', 'getRole');
+        Route::post('/roles/{role_id}', 'updateRoleWithPermissions');
+        Route::delete('/roles/{role_id}', 'deleteRole');
+    });
+
+    Route::controller(UsersController::class)->group(function () {
+        Route::get('/users', 'getAll');
+        Route::get('/users/{id}', 'getOne');
+        Route::post('/users', 'create');
+        Route::put('/users/{id}', 'update');
+        Route::delete('/users/{id}', 'delete');
+    });
+
 });
 
 
-Route::controller(UsersController::class)->group(function () {
-    Route::get('/users', 'getAll');
-    Route::get('/users/{id}', 'getOne');
-    Route::post('/users', 'create');
-    Route::put('/users/{id}', 'update');
-    Route::delete('/users/{id}', 'delete');
-});
 
-Route::controller(PermissionsController::class)->group(function () {
-    Route::get('/permissions', 'getAllPermissions');
-    Route::get('/roles', 'getAllRoles');
-    Route::post('/roles', 'createRoleWithPermissions');
-    Route::get('/roles/{role_id}', 'getRole');
-    Route::post('/roles/{role_id}', 'updateRoleWithPermissions');
-    Route::delete('/roles/{role_id}', 'deleteRole');
-});
+
+
 
 
 Route::controller(CategoriesController::class)->group(function () {

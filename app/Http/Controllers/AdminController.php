@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Lang;
+use Spatie\Permission\Models\Role;
 
 class AdminController extends Controller implements HasMiddleware
 {
@@ -32,18 +33,18 @@ class AdminController extends Controller implements HasMiddleware
             'sort_direction' => 'nullable|string|in:asc,desc',
             'search' => 'string|max:100|nullable',
             'role' => 'nullable|string',
-            'active' => 'nullable|boolean',
+            'active' => 'nullable|in:true,false,0,1',
         ]);
 
         $query = Admin::query()->with(['roles', 'media']);
 
         // Filtering
         if ($request->has('active')) {
-            $query->where('active', $request->active);
+            $query->where('active', filter_var($request->active, FILTER_VALIDATE_BOOLEAN));
         }
 
         if ($request->has('role')) {
-            $query->whereHas('roles', function($q) use ($request) {
+            $query->whereHas('roles', function ($q) use ($request) {
                 $q->where('name', $request->role);
             });
         }
@@ -51,9 +52,9 @@ class AdminController extends Controller implements HasMiddleware
         // Search functionality
         if ($request->has('search')) {
             $searchTerm = "%{$request->search}%";
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                  ->orWhere('email', 'like', $searchTerm);
+                    ->orWhere('email', 'like', $searchTerm);
             });
         }
 
@@ -63,7 +64,7 @@ class AdminController extends Controller implements HasMiddleware
         $query->orderBy($sortBy, $sortDirection);
 
         // Pagination
-        $perPage = $request->get('per_page', 2);
+        $perPage = $request->get('per_page', 10);
         $admins = $query->paginate($perPage);
 
         return $this->ApiResponseFormatted(
@@ -85,23 +86,70 @@ class AdminController extends Controller implements HasMiddleware
 
     public function getOne(Request $request, $id)
     {
-        $admin = Admin::with('roles', 'media')->find($id);
-        if (!$admin) {
-            return $this->ApiResponseFormatted(404, null, Lang::get('api.not_found'), $request);
+        try {
+            // Retrieve admin with essential relationships
+            $admin = Admin::with(['roles:id,name', 'media' => function ($query) {
+                $query->where('collection_name', 'avatars');
+            }])->findOrFail($id);
+
+            return $this->ApiResponseFormatted(
+                200,
+                new AdminResource($admin),
+                Lang::get('api.success'),
+                $request
+            );
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->ApiResponseFormatted(
+                404,
+                null,
+                Lang::get('api.not_found'),
+                $request
+            );
+        } catch (\Exception $e) {
+            return $this->ApiResponseFormatted(
+                500,
+                null,
+                Lang::get('api.error'),
+                $request
+            );
         }
-        return $this->ApiResponseFormatted(200, new AdminResource($admin), Lang::get('api.success'), $request);
     }
 
-    public function create(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:admins,email',
-            'password' => 'required|string',
-        ]);
-        $admin = Admin::create($request->all());
-        return $this->ApiResponseFormatted(201, new AdminResource($admin), Lang::get('api.created'), $request);
+public function create(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:admins,email',
+        'password' => 'required|string|min:8',
+        'active' => 'nullable|in:true,false,0,1',
+        'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'roles' => 'nullable|array',
+        'roles.*' => 'integer|exists:roles,id',
+    ]);
+
+    // Create admin with validated data
+    $createData = [
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => bcrypt($validated['password']),
+        'active' => isset($validated['active']) ? filter_var($validated['active'], FILTER_VALIDATE_BOOLEAN) : true,
+    ];
+
+    $admin = Admin::create($createData);
+
+    // Handle roles assignment
+    if ($request->has('roles')) {
+        $roles = Role::whereIn('id', $validated['roles'])->get();
+        $admin->syncRoles($roles);
     }
+
+    // Handle avatar upload
+    if ($request->hasFile('avatar')) {
+        $admin->addMediaFromRequest('avatar')->toMediaCollection('avatars');
+    }
+
+    return $this->ApiResponseFormatted(201, new AdminResource($admin), Lang::get('api.created'), $request);
+}
 
     public function update(Request $request, $id)
     {
@@ -109,13 +157,47 @@ class AdminController extends Controller implements HasMiddleware
         if (!$admin) {
             return $this->ApiResponseFormatted(404, null, Lang::get('api.not_found'), $request);
         }
-        $request->validate([
-            'name' => 'required|string',
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:admins,email,' . $id,
-            'password' => 'required|string',
-            'active' => 'required|boolean',
+            'password' => 'nullable|string|min:8',
+            'active' => 'nullable|in:true,false,0,1',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'roles' => 'nullable|array',
+            'roles.*' => 'integer|exists:roles,id',
+            'remove_avatar' => 'nullable|in:0,1',
         ]);
-        $admin->update($request->all());
+
+        // Update admin with validated data
+        $updateData = array_filter([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'active' => isset($validated['active']) ? filter_var($validated['active'], FILTER_VALIDATE_BOOLEAN) : $admin->active,
+        ]);
+
+        // Update password only if provided
+        if (!empty($validated['password'])) {
+            $updateData['password'] = bcrypt($validated['password']);
+        }
+
+        $admin->update($updateData);
+
+        // Handle roles assignment
+        if ($request->has('roles')) {
+            $roles = Role::whereIn('id', $validated['roles'])->get();
+            $admin->syncRoles($roles);
+        }
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            $admin->clearMediaCollection('avatars');
+            $admin->addMediaFromRequest('avatar')->toMediaCollection('avatars');
+        } // Handle avatar removal
+        elseif ($request->input('remove_avatar') == '1' && $admin->hasMedia('avatars')) {
+            $admin->clearMediaCollection('avatars');
+        }
+
         return $this->ApiResponseFormatted(200, new AdminResource($admin), Lang::get('api.updated'), $request);
     }
 
