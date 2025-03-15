@@ -59,7 +59,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/users', 'getAll');
         Route::get('/users/{id}', 'getOne');
         Route::post('/users', 'create');
-        Route::put('/users/{id}', 'update');
+        Route::post('/users/{id}', 'update');
         Route::delete('/users/{id}', 'delete');
     });
 

@@ -20,10 +20,9 @@ class UserResource extends JsonResource
             "fname" => $this->fname,
             "lname" => $this->lname,
             "email" => $this->email,
-//            "phone"=>$this->phone,
-            'email_verified' => !!$this->email_verified_at,
-
-
+            "locale" => $this->locale,
+            "avatar" => $this->getFirstMediaUrl('avatars'),
+            "created_at" => $this->created_at,
         ];
     }
 }

@@ -12,13 +12,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Permission\Traits\HasRoles;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class User extends Authenticatable implements HasMedia
 {
-    use HasApiTokens,HasFactory, Notifiable,HasRoles,InteractsWithMedia,CanResetPassword;
+    use HasApiTokens,HasFactory, Notifiable,InteractsWithMedia,CanResetPassword;
 
     /**
      * The attributes that are mass assignable.
