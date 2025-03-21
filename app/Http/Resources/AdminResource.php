@@ -22,7 +22,7 @@ class AdminResource extends JsonResource
             "locale" => $this->locale,
             "active" => !!$this->active,
             "avatar" => $this->getFirstMediaUrl('avatars'),
-            "roles" => RoleResource::collection($this->roles),
+            "roles" => RoleResource::collection($this->whenLoaded('roles')),
             "created_at" => $this->created_at,
         ];
     }

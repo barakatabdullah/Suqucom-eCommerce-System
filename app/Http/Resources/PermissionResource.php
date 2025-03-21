@@ -16,11 +16,11 @@ class PermissionResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "id"=>$this->id,
-            "key"=>$this->name,
-            "name"=> Lang::get("permissions.".$this->name),
-            "guard_name"=>$this->guard_name,
-
+            "id" => $this->id,
+            "name" => $this->name,
+            'section' => $this->section,
+            "action" => Lang::get('permissions.' .$this->action),
+            "guard_name" => $this->guard_name,
         ];
     }
 }

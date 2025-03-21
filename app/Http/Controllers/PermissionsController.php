@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PermissionResource;
+use App\Http\Resources\RoleResource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
@@ -16,25 +17,33 @@ class PermissionsController extends Controller implements HasMiddleware
     {
         return ['auth:admin'];
     }
+
     public function getAllPermissions(Request $request)
     {
         $permissions = Permission::all();
+        $groupedPermissions = $permissions->groupBy('section');
 
-        return $this->ApiResponseFormatted(200,PermissionResource::collection($permissions), Lang::get('api.success'), $request);
+        $result = [];
+        foreach ($groupedPermissions as $section => $perms) {
+            $sectionName = Lang::get('permissions.' . $section);
+            $result[$sectionName] = PermissionResource::collection($perms);
+        }
+
+        return $this->ApiResponseFormatted(200, $result, Lang::get('api.success'), $request);
     }
 
-    public function getAllRoles()
+    public function getAllRoles(Request $request)
     {
         $roles = Role::with('permissions')->get();
 
-        return response()->json(['data' => $roles], 200);
+        return $this->ApiResponseFormatted(200, RoleResource::collection($roles), Lang::get('api.success'), $request);
     }
 
-    public function getRole($role_id)
+    public function getRole(Request $request,$role_id)
     {
         $role = Role::with('permissions')->find($role_id);
 
-        return response()->json(['data' => $role], 200);
+        return $this->ApiResponseFormatted(200, RoleResource::make($role), Lang::get('api.success'), $request);
     }
 
     public function updateRoleWithPermissions(Request $request, $role_id)

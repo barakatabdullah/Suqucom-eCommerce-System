@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\AdminResource;
+use App\Models\Admin;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -115,7 +116,7 @@ class AuthController extends Controller implements HasMiddleware
 
         try {
             $credentials = $request->only(['email', 'password']);
-            $admin = User::where('email', $credentials['email'])->first();
+            $admin = Admin::where('email', $credentials['email'])->first();
 
             if (!$admin || !Hash::check($credentials['password'], $admin->password)) {
                 return $this->ApiResponseFormatted(401, null, \Lang::get('api.unauthorized'), $request);

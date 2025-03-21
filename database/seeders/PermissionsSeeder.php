@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
+use App\Models\User;
+use App\Services\PermissionGenerator;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\PermissionRegistrar;
@@ -18,90 +21,71 @@ class PermissionsSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Define categorized permissions
-        $permissions = [
-            'admin'=> [
-                'create_admin',
-                'edit_admin',
-                'delete_admin',
-                'view_admin',
-            ],
-            'roles' => [
-                'create_role',
-                'edit_role',
-                'delete_role',
-                'view_role',
-            ],
-            'products' => [
-                'create_product',
-                'edit_product',
-                'delete_product',
-                'view_product',
-            ],
-            'attributes' => [
-                'create_attribute',
-                'edit_attribute',
-                'delete_attribute',
-                'view_attribute',
-            ],
-            'brands' => [
-                'create_brand',
-                'edit_brand',
-                'delete_brand',
-                'view_brand',
-            ],
-            'orders' => [
-                'create_order',
-                'edit_order',
-                'delete_order',
-                'view_order',
-            ],
-            'categories' => [
-                'create_category',
-                'edit_category',
-                'delete_category',
-                'view_category',
-            ],
-            'users' => [
-                'create_user',
-                'edit_user',
-                'delete_user',
-                'view_user',
-            ],
-            'ratings' => [
-               'manage_ratings',
-            ],
-            'settings' => [
-                'manage_settings',
-            ],
-//            'affiliates' => [
-//                'manage affiliates',
-//                'create affiliates',
-//                'edit affiliates',
-//                'delete affiliates',
-//                'view affiliates',
-//                'manage affiliate commissions',
-//                'create affiliate commissions',
-//                'edit affiliate commissions',
-//                'delete affiliate commissions',
-//                'view affiliate commissions',
-//            ],
+        $permissionGenerator = new PermissionGenerator();
 
-        ];
 
-        // Create permissions
-        foreach ($permissions as $category => $perms) {
-            foreach ($perms as $permission) {
-                if (!Permission::where('name', $permission)->exists()) {
-                    Permission::create([
-                        'name' => $permission,
-                        'guard_name' => 'admin'
-                    ]);
+// Generate permissions for all models
+        $modelsPath = app_path('Models');
+        $modelFiles = glob($modelsPath . '/*.php');
+
+        foreach ($modelFiles as $file) {
+            $className = pathinfo($file, PATHINFO_FILENAME);
+            $fullClassName = "App\\Models\\{$className}";
+
+            try {
+                // Skip if class doesn't exist
+                if (!class_exists($fullClassName)) {
+                    continue;
                 }
+
+                $reflection = new \ReflectionClass($fullClassName);
+
+                // Skip abstract classes, traits or interfaces
+                if ($reflection->isAbstract() || $reflection->isTrait() || $reflection->isInterface()) {
+                    continue;
+                }
+
+                // Skip if not an Eloquent model
+                if (!is_subclass_of($fullClassName, 'Illuminate\Database\Eloquent\Model')) {
+                    continue;
+                }
+
+                // Generate permissions for this model
+                $permissionGenerator->generateForModel($fullClassName);
+            } catch (\Exception $e) {
+                // Skip any files that cause errors during reflection
+                continue;
             }
         }
 
 
+        // Create additional custom permissions
+        $customPermissions = [
+            [
+                'name' => 'manage-settings',
+                'section' => 'settings',
+                'action' => 'manage',
+            ],
+            [
+                'name' => 'view-dashboard',
+                'section' => 'pages',
+                'action' => 'view',
+            ],
+
+        ];
+
+        foreach ($customPermissions as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission['name'],
+                'guard_name' => 'admin',
+                'section' => $permission['section'],
+                'action' => $permission['action']
+            ]);
+        }
+
+        // Assign all permissions to super-admin
+        $superAdminRole = Role::findOrCreate('super-admin', 'admin');
+        $superAdminRole->syncPermissions(Permission::all());
 
 
     }
